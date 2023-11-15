@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+    .producto-card {
+      border: 1px solid #ddd;
+      padding: 10px;
+      margin: 10px;
+      text-align: center;
+      width: 200px;
+      display: inline-block;
+    }
+
+    .producto-img {
+      max-width: 100%;
+      height: auto;
+    }
+
+    .agregar-carrito-btn {
+      margin-top: 10px;
+      background-color: #4caf50;
+      color: white;
+      padding: 10px;
+      cursor: pointer;
+      border: none;
+      border-radius: 5px;
+    }
+  </style>
+    </style>
+  </head>
+  <body>
+    <h1>Carrito de Compras</h1>
+    <button onclick="agregarAlCarrito('Producto 1', 50)">Agregar Producto 1</button>
+    <button onclick="agregarAlCarrito('Producto 2', 30)">Agregar Producto 2</button>
+    <button onclick="agregarAlCarrito('Producto 3', 10)">Agregar Producto 2</button>
+    <div id="carrito">
+      <h2>Carrito</h2>
+      <ul id="lista-carrito"></ul>
+      <p>Total: $<span id="total">0</span></p>
+      <button id="pagarConStripe">Pagar con Stripe</button>
+      <button id="pagarConPayPal">Pagar con PayPal</button>
+      <button id="checkoutMP">Pagar con MercadoPago</button>
+      
+    <script>
+          let carrito = [];
+    let total = 0;
+
+    function agregarAlCarrito(producto, precio) {
+      carrito.push({ producto, precio });
+      total += precio;
+      actualizarCarrito();
+    }
+
+    function actualizarCarrito() {
+      const listaCarrito = document.getElementById('lista-carrito');
+      const totalElement = document.getElementById('total');
+
+      listaCarrito.innerHTML = '';
+      carrito.forEach(item => {
+        const li = document.createElement('li');
+        li.textContent = `${item.producto}: $${item.precio}`;
+        listaCarrito.appendChild(li);
+      });
+
+      totalElement.textContent = total;
+    }
+      const checkout = document.getElementById("pagarConPayPal");
+      checkout.addEventListener("click", async () => {
+        try {
+          const response = await fetch("/create-order", {
+            method: "POST",
+          });
+          if (!response.ok) {
+            throw new Error("Error al crear la orden");
+          }
+          const data = await response.json();
+          window.location.href = data.links[1].href;
+        } catch (error) {
+          console.error("Error:", error);
+        }
+      });
+      const button = document.getElementById("pagarConStripe");
+        button.addEventListener('click', async () => {
+
+            const res = await fetch ('/create-checkout-session',{
+                method: 'POST',
+            });
+            const data= await res.json();
+            console.log(data);
+            window.location.href = data.url 
+        });
+
+      const checkoutmp = document.getElementById('checkoutMP')
+        checkoutmp.addEventListener('click', async() => {
+            const response = await fetch ('/create-order-mp', {
+                method: 'POST'
+            })
+            const data = await response.json()
+            console.log(data)
+            window.location.href = data.init_point;
+        });
+    </script></script>
+  </body>
+</html>
